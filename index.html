@@ -11,56 +11,68 @@
             height: 600px;
         }
 
-        /* Add any additional CSS styles here */
+        .inhabitant {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            border: 1px solid #000;
+            border-radius: 5px;
+            cursor: move;
+        }
     </style>
 </head>
 
 <body>
     <div id="map"></div>
 
+    <!-- Example of HTML elements representing inhabitants -->
+    <div id="inhabitants-container">
+        <div class="inhabitant" data-lat="51.5" data-lng="-0.1">John Doe</div>
+        <div class="inhabitant" data-lat="51.51" data-lng="-0.09">Jane Smith</div>
+        <!-- Add more inhabitants as needed -->
+    </div>
+
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        // Initialize Leaflet map
         var map = L.map('map').setView([51.505, -0.09], 13);
 
-        // Add a base map layer (you can choose different tile providers)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Example of adding markers to the map
-        var markers = []; // Array to hold marker objects
-
-        // Example data - you should replace this with your own data
-        var inhabitantsData = [
-            { name: "John Doe", latlng: [51.5, -0.1] },
-            { name: "Jane Smith", latlng: [51.51, -0.09] },
-            // Add more data as needed
-        ];
-
-        // Function to add markers to the map
-        function addMarkers() {
-            inhabitantsData.forEach(function (inhabitant) {
-                var marker = L.marker(inhabitant.latlng).addTo(map);
-                markers.push(marker);
+        // Function to add inhabitants to the map
+        function addInhabitants() {
+            var container = document.getElementById('inhabitants-container');
+            var inhabitants = container.querySelectorAll('.inhabitant');
+            inhabitants.forEach(function (inhabitant) {
+                var lat = parseFloat(inhabitant.getAttribute('data-lat'));
+                var lng = parseFloat(inhabitant.getAttribute('data-lng'));
+                var divIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: inhabitant.outerHTML
+                });
+                var marker = L.marker([lat, lng], { icon: divIcon }).addTo(map);
+                // Enable dragging for the inhabitant HTML element
+                marker.getElement().querySelector('.inhabitant').draggable = true;
             });
         }
 
-        // Call the function to add markers to the map
-        addMarkers();
+        // Call the function to add inhabitants to the map
+        addInhabitants();
 
-        // Add event listener for zoomend event to handle aggregation of markers
+        // Add event listener for zoomend event to handle data aggregation
         map.on('zoomend', function () {
             var zoomLevel = map.getZoom();
+            var inhabitantsContainer = document.getElementById('inhabitants-container');
             if (zoomLevel <= 7) {
-                // Aggregate markers (e.g., display number of inhabitants)
-                // Your implementation here
-                // You may need to remove individual markers from the map
+                // Aggregate data (e.g., display number of inhabitants)
+                var totalInhabitants = inhabitantsContainer.querySelectorAll('.inhabitant').length;
+                inhabitantsContainer.innerHTML = '<div class="inhabitant" style="top: 50%; left: 50%;">' + totalInhabitants + ' inhabitants</div>';
             } else {
-                // Show individual markers
-                markers.forEach(function (marker) {
-                    map.addLayer(marker);
-                });
+                // Show individual inhabitants
+                // Restore the original HTML elements
+                inhabitantsContainer.innerHTML = '';
+                addInhabitants();
             }
         });
     </script>
