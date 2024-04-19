@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Map with Inhabitants</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+        }
+
+        /* Add any additional CSS styles here */
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize Leaflet map
+        var map = L.map('map').setView([51.505, -0.09], 13);
+
+        // Add a base map layer (you can choose different tile providers)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Example of adding markers to the map
+        var markers = []; // Array to hold marker objects
+
+        // Example data - you should replace this with your own data
+        var inhabitantsData = [
+            { name: "John Doe", latlng: [51.5, -0.1] },
+            { name: "Jane Smith", latlng: [51.51, -0.09] },
+            // Add more data as needed
+        ];
+
+        // Function to add markers to the map
+        function addMarkers() {
+            inhabitantsData.forEach(function (inhabitant) {
+                var marker = L.marker(inhabitant.latlng).addTo(map);
+                markers.push(marker);
+            });
+        }
+
+        // Call the function to add markers to the map
+        addMarkers();
+
+        // Add event listener for zoomend event to handle aggregation of markers
+        map.on('zoomend', function () {
+            var zoomLevel = map.getZoom();
+            if (zoomLevel <= 7) {
+                // Aggregate markers (e.g., display number of inhabitants)
+                // Your implementation here
+                // You may need to remove individual markers from the map
+            } else {
+                // Show individual markers
+                markers.forEach(function (marker) {
+                    map.addLayer(marker);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
